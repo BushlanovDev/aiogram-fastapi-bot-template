@@ -1,5 +1,4 @@
 import logging
-import sys
 from typing import Callable, Optional
 
 import uvicorn
@@ -16,11 +15,11 @@ from fastapi.requests import Request
 from configs.config import Settings, TgBot, App
 from handlers.handlers import Handlers
 from keyboards.keyboards import Keyboards
-from middlewares.ThrottlingMiddleware import ThrottlingMiddleware
+from middlewares.throttling import ThrottlingMiddleware
 from services.bot_service import BotService
 from states.bot_state import BotState
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('main')
 
 
 def create_startup_handler(bot: Bot, dp: Dispatcher, url: str) -> Callable:
@@ -85,6 +84,10 @@ def register_middlewares(dp: Dispatcher) -> None:
     dp.update.middleware(ThrottlingMiddleware())
 
 
+def register_workflow_data(dp: Dispatcher) -> None:
+    dp.workflow_data.update({'answer': 'Hello'})
+
+
 def create_app(bot: Bot, dp: Dispatcher, settings: App) -> FastAPI:
     app = FastAPI()
     app.add_event_handler('startup', create_startup_handler(bot, dp, settings.url + settings.webhook_path))
@@ -95,21 +98,16 @@ def create_app(bot: Bot, dp: Dispatcher, settings: App) -> FastAPI:
 
 
 def main() -> None:
-    logging.basicConfig(
-        level=logging.DEBUG,
-        stream=sys.stdout,
-        format='%(levelname)-8s [%(asctime)s] [%(name)s] %(message)s',
-    )
-
     settings = Settings()
+
+    logging.config.dictConfig(settings.logging)
 
     bot = create_bot(settings.tg_bot)
     dp = create_dispatcher(MemoryStorage())
     app = create_app(bot, dp, settings.app)
     register_message_handlers(dp, Handlers(bot, Keyboards(), BotService()))
     register_middlewares(dp)
-
-    dp.workflow_data.update({'answer': 'Hello'})
+    register_workflow_data(dp)
 
     logger.debug('Application is running')
 
