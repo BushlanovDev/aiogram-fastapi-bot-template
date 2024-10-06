@@ -1,3 +1,5 @@
+from typing import Optional
+
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 
 
@@ -14,10 +16,10 @@ class Keyboards:
 
         return ReplyKeyboardMarkup(keyboard=kb_list, resize_keyboard=True, one_time_keyboard=True)
 
-    def get_inline_button(self) -> InlineKeyboardMarkup:
+    def get_inline_button(self, callback_data: Optional[str] = None) -> InlineKeyboardMarkup:
         inline_kb_list = [
             [
-                InlineKeyboardButton(text='Save', callback_data='save'),
+                InlineKeyboardButton(text='Save', callback_data=callback_data),
             ],
         ]
 

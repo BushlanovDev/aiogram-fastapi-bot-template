@@ -3,8 +3,9 @@ from typing import Optional
 from aiogram import Bot
 from aiogram.enums import ChatAction
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 
+from callbacks.callback import SaveCallbackFactory
 from keyboards.keyboards import Keyboards
 from services.bot_service import BotService
 from states.bot_state import BotState
@@ -41,11 +42,16 @@ class Handlers:
         await message.answer(f"Step 1: {data['step_1']}\n" f"Step 2: {data['step_2']}")
         await state.clear()
 
-    async def answer_inline_button(self, message: Message, answer: str):
-        await message.answer(text='This help message.', reply_markup=self.kb.get_inline_button())
+    async def answer_inline_button(self, message: Message):
+        callback = SaveCallbackFactory(message_id=message.message_id).pack()
+        await message.answer(text='This help message', reply_markup=self.kb.get_inline_button(callback_data=callback))
 
     async def reply(self, message: Message):
         await message.reply(text=self.bot_service.upper(message.text))
+
+    async def process_any_inline_button_press(self, callback: CallbackQuery, callback_data: SaveCallbackFactory):
+        await callback.message.answer(text=callback_data.pack())
+        await callback.answer()
 
     async def __send_message(self, chat_id: int, text: str, reply_to_message_id: Optional[int] = None) -> int:
         await self.bot.send_chat_action(chat_id, ChatAction.TYPING)

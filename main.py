@@ -12,6 +12,7 @@ from aiogram.types import Update, BotCommand
 from fastapi import FastAPI
 from fastapi.requests import Request
 
+from callbacks.callback import SaveCallbackFactory
 from configs.config import Settings, TgBot, App
 from handlers.handlers import Handlers
 from keyboards.keyboards import Keyboards
@@ -69,7 +70,7 @@ def create_dispatcher(storage: Optional[BaseStorage] = None) -> Dispatcher:
     return Dispatcher(storage=storage)
 
 
-def register_message_handlers(dp: Dispatcher, hd: Handlers) -> None:
+def register_handlers(dp: Dispatcher, hd: Handlers) -> None:
     dp.message.register(hd.start_command, CommandStart())
     dp.message.register(hd.help_command, Command(commands='help'))
     dp.message.register(hd.answer, F.text == 'hi')
@@ -78,6 +79,7 @@ def register_message_handlers(dp: Dispatcher, hd: Handlers) -> None:
     dp.message.register(hd.answer_fsm_state_1, BotState.waiting_step_1)
     dp.message.register(hd.answer_fsm_state_2, BotState.waiting_step_2)
     dp.message.register(hd.reply)
+    dp.callback_query.register(hd.process_any_inline_button_press, SaveCallbackFactory.filter())
 
 
 def register_middlewares(dp: Dispatcher) -> None:
@@ -105,7 +107,7 @@ def main() -> None:
     bot = create_bot(settings.tg_bot)
     dp = create_dispatcher(MemoryStorage())
     app = create_app(bot, dp, settings.app)
-    register_message_handlers(dp, Handlers(bot, Keyboards(), BotService()))
+    register_handlers(dp, Handlers(bot, Keyboards(), BotService()))
     register_middlewares(dp)
     register_workflow_data(dp)
 
