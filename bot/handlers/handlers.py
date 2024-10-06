@@ -5,10 +5,10 @@ from aiogram.enums import ChatAction
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
 
-from callbacks.callback import SaveCallbackFactory
-from keyboards.keyboards import Keyboards
-from services.bot_service import BotService
-from states.bot_state import BotState
+from bot.callbacks.callback import SaveCallbackFactory
+from bot.keyboards.keyboards import Keyboards
+from bot.services.bot_service import BotService
+from bot.states.bot_state import BotState
 
 
 class Handlers:

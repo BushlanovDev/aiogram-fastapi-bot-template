@@ -12,13 +12,13 @@ from aiogram.types import Update, BotCommand
 from fastapi import FastAPI
 from fastapi.requests import Request
 
-from callbacks.callback import SaveCallbackFactory
-from configs.config import Settings, TgBot, App
-from handlers.handlers import Handlers
-from keyboards.keyboards import Keyboards
-from middlewares.throttling import ThrottlingMiddleware
-from services.bot_service import BotService
-from states.bot_state import BotState
+from bot.callbacks.callback import SaveCallbackFactory
+from bot.configs.config import Settings, TgBot, App
+from bot.handlers.handlers import Handlers
+from bot.keyboards.keyboards import Keyboards
+from bot.middlewares.throttling import ThrottlingMiddleware
+from bot.services.bot_service import BotService
+from bot.states.bot_state import BotState
 
 logger = logging.getLogger('main')
 

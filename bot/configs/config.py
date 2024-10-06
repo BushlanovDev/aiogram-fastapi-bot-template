@@ -5,7 +5,7 @@ from pydantic_settings import BaseSettings
 
 
 class App(BaseSettings):
-    port: int = 80
+    port: int = 8080
     url: str = 'https://my.domain'
     webhook_path: str = '/webhook/tg'
 
