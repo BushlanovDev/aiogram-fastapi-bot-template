@@ -1,9 +1,7 @@
-from typing import Optional
-
 from aiogram import Bot
 from aiogram.enums import ChatAction
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import CallbackQuery, Message
 
 from bot.callbacks.callback import SaveCallbackFactory
 from bot.keyboards.keyboards import Keyboards
@@ -12,7 +10,6 @@ from bot.states.bot_state import BotState
 
 
 class Handlers:
-
     def __init__(self, bot: Bot, kb: Keyboards, bot_service: BotService):
         self.bot = bot
         self.kb = kb
@@ -38,8 +35,8 @@ class Handlers:
 
     async def answer_fsm_state_2(self, message: Message, state: FSMContext):
         await state.update_data(step_2=message.text)
-        data = await  state.get_data()
-        await message.answer(f"Step 1: {data['step_1']}\n" f"Step 2: {data['step_2']}")
+        data = await state.get_data()
+        await message.answer(f"Step 1: {data['step_1']}\nStep 2: {data['step_2']}")
         await state.clear()
 
     async def answer_inline_button(self, message: Message):
@@ -53,7 +50,7 @@ class Handlers:
         await callback.message.answer(text=callback_data.pack())
         await callback.answer()
 
-    async def __send_message(self, chat_id: int, text: str, reply_to_message_id: Optional[int] = None) -> int:
+    async def __send_message(self, chat_id: int, text: str, reply_to_message_id: int | None = None) -> int:
         await self.bot.send_chat_action(chat_id, ChatAction.TYPING)
         message = await self.bot.send_message(chat_id=chat_id, text=text, reply_to_message_id=reply_to_message_id)
 

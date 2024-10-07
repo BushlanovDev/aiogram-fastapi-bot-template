@@ -1,5 +1,6 @@
 import logging
-from typing import Any, Awaitable, Callable, Dict
+from collections.abc import Awaitable, Callable
+from typing import Any
 
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject, User
@@ -7,16 +8,15 @@ from cachetools import TTLCache
 
 logger = logging.getLogger(__name__)
 
-CACHE = TTLCache(maxsize=10_000, ttl=2)  # Максимальный размер кэша - 10000 ключей, а время жизни ключа - 5 секунд
+CACHE = TTLCache(maxsize=10_000, ttl=2)  # Максимальный размер кэша - 10000 ключей, время жизни ключа - 5 секунд
 
 
 class ThrottlingMiddleware(BaseMiddleware):
-
     async def __call__(
             self,
-            handler: Callable[[TelegramObject, Dict[str, Any]], Awaitable[Any]],
+            handler: Callable[[TelegramObject, dict[str, Any]], Awaitable[Any]],
             event: TelegramObject,
-            data: Dict[str, Any],
+            data: dict[str, Any],
     ) -> Any:
         user: User = data.get('event_from_user')
 

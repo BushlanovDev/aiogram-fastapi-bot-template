@@ -1,5 +1,4 @@
 class BotService:
-
     def __init__(self):
         pass
 

@@ -5,15 +5,15 @@ import uvicorn
 from aiogram import Bot, Dispatcher, F
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
-from aiogram.filters import CommandStart, Command
+from aiogram.filters import Command, CommandStart
 from aiogram.fsm.storage.base import BaseStorage
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.types import Update, BotCommand
+from aiogram.types import BotCommand, Update
 from fastapi import FastAPI
 from fastapi.requests import Request
 
 from bot.callbacks.callback import SaveCallbackFactory
-from bot.configs.config import Settings, TgBot, App
+from bot.configs.config import App, Settings, TgBot
 from bot.handlers.handlers import Handlers
 from bot.keyboards.keyboards import Keyboards
 from bot.middlewares.throttling import ThrottlingMiddleware
@@ -25,24 +25,29 @@ logger = logging.getLogger('main')
 
 def create_startup_handler(bot: Bot, dp: Dispatcher, url: str) -> Callable:
     async def startup_handler() -> None:
-        await bot.set_webhook(
-            url=url,
-            allowed_updates=dp.resolve_used_update_types(),
-            drop_pending_updates=True,
-        )
+        webhook_info = await bot.get_webhook_info()
+        if webhook_info.url != url:
+            await bot.set_webhook(
+                url=url,
+                allowed_updates=dp.resolve_used_update_types(),
+                drop_pending_updates=True,
+            )
 
-        await bot.set_my_commands([
-            BotCommand(command='/help', description='Help'),
-        ])
+        await bot.set_my_commands(
+            [
+                BotCommand(command='/help', description='Help'),
+            ]
+        )
 
         logger.debug('startup_handler')
 
     return startup_handler
 
 
-def create_shutdown_handler(bot: Bot) -> Callable:
+def create_shutdown_handler(bot: Bot, debug: bool) -> Callable:
     async def shutdown_handler() -> None:
-        await bot.delete_webhook()
+        if debug:
+            await bot.delete_webhook()
         logger.debug('shutdown_handler')
 
     return shutdown_handler
@@ -51,7 +56,7 @@ def create_shutdown_handler(bot: Bot) -> Callable:
 def create_webhook_handler(bot: Bot, dp: Dispatcher) -> Callable:
     async def webhook_handler(request: Request) -> None:
         try:
-            update = Update.model_validate(await request.json(), context={"bot": bot})
+            update = Update.model_validate(await request.json(), context={'bot': bot})
             logger.info(f'Received update: {update.update_id}')
             await dp.feed_update(bot, update)
             logger.debug(f'Successfully processed update: {update.update_id}')
@@ -93,7 +98,7 @@ def register_workflow_data(dp: Dispatcher) -> None:
 def create_app(bot: Bot, dp: Dispatcher, settings: App) -> FastAPI:
     app = FastAPI()
     app.add_event_handler('startup', create_startup_handler(bot, dp, settings.url + settings.webhook_path))
-    app.add_event_handler('shutdown', create_shutdown_handler(bot))
+    app.add_event_handler('shutdown', create_shutdown_handler(bot, settings.debug))
     app.add_api_route(settings.webhook_path, create_webhook_handler(bot, dp), methods=['POST'])
 
     return app

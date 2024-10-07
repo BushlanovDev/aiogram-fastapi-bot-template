@@ -1,10 +1,11 @@
-from typing import Any, Dict
+from typing import Any
 
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings
 
 
 class App(BaseSettings):
+    debug: bool = True
     port: int = 8080
     url: str = 'https://my.domain'
     webhook_path: str = '/webhook/tg'
@@ -17,15 +18,12 @@ class TgBot(BaseSettings):
 class Settings(BaseSettings):
     app: App
     tg_bot: TgBot
-    logging: Dict[str, Any] = {
+    logging: dict[str, Any] = {
         'version': 1,
         'disable_existing_loggers': True,
         'formatters': {
             'default': {
                 'format': '%(levelname)-8s [%(asctime)s] [%(name)s] %(message)s',
-            },
-            'uvicorn_access': {
-                'format': '%(levelname)-8s [%(asctime)s] [%(name)s] - %(client_addr)s - "%(request_line)s" %(status_code)s',
             },
         },
         'handlers': {
