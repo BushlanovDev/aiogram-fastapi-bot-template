@@ -8,7 +8,7 @@ from cachetools import TTLCache
 
 logger = logging.getLogger(__name__)
 
-CACHE = TTLCache(maxsize=10_000, ttl=2)  # Максимальный размер кэша - 10000 ключей, время жизни ключа - 5 секунд
+CACHE = TTLCache(maxsize=10_000, ttl=2)  # Максимальный размер кэша - 10000 ключей, время жизни ключа - 2 секунды
 
 
 class ThrottlingMiddleware(BaseMiddleware):
@@ -20,10 +20,11 @@ class ThrottlingMiddleware(BaseMiddleware):
     ) -> Any:
         user: User = data.get('event_from_user')
 
-        if user.id in CACHE:
-            logger.debug(f'Throttling for user {user.id}')
-            return
+        if user is not None:
+            if user.id in CACHE:
+                logger.debug(f'Throttling for user {user.id}')
+                return
 
-        CACHE[user.id] = True
+            CACHE[user.id] = True
 
         return await handler(event, data)

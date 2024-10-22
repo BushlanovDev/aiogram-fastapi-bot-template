@@ -9,6 +9,7 @@ class App(BaseSettings):
     port: int = 8080
     url: str = 'https://my.domain'
     webhook_path: str = '/webhook/tg'
+    default_language: str = 'en'
 
 
 class TgBot(BaseSettings):

@@ -4,6 +4,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
 from bot.callbacks.callback import SaveCallbackFactory
+from bot.i18n.lexicon import Lexicon
 from bot.keyboards.keyboards import Keyboards
 from bot.services.bot_service import BotService
 from bot.states.bot_state import BotState
@@ -15,11 +16,14 @@ class Handlers:
         self.kb = kb
         self.bot_service = bot_service
 
-    async def start_command(self, message: Message):
-        await message.answer(text='Hi user! This start message.', reply_markup=self.kb.get_start_button())
+    async def start_command(self, message: Message, lexicon: Lexicon, user_lang: str | None):
+        await message.answer(
+            text=lexicon.get_text('Hi user! This start message.', user_lang),
+            reply_markup=self.kb.get_start_button(),
+        )
 
-    async def help_command(self, message: Message):
-        await message.answer(text='This help message.')
+    async def help_command(self, message: Message, lexicon: Lexicon, user_lang: str | None):
+        await message.answer(text=lexicon.get_text('This help message.', user_lang))
 
     async def answer(self, message: Message, answer: str):
         await self.__send_message(message.chat.id, answer, message.message_id)
@@ -39,9 +43,12 @@ class Handlers:
         await message.answer(f"Step 1: {data['step_1']}\nStep 2: {data['step_2']}")
         await state.clear()
 
-    async def answer_inline_button(self, message: Message):
+    async def answer_inline_button(self, message: Message, lexicon: Lexicon):
         callback = SaveCallbackFactory(message_id=message.message_id).pack()
-        await message.answer(text='This help message', reply_markup=self.kb.get_inline_button(callback_data=callback))
+        await message.answer(
+            text=lexicon.get_text('Inline button message'),
+            reply_markup=self.kb.get_inline_button(callback_data=callback),
+        )
 
     async def reply(self, message: Message):
         await message.reply(text=self.bot_service.upper(message.text))
