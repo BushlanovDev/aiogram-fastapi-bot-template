@@ -29,13 +29,13 @@ Run bot `python main.py` or `docker compose up -d`
 
 ### 📁 Bot structure
 
-| Folder      | Description                                 |
-|-------------|---------------------------------------------|
-| callbacks   | Callback data                               |
-| configs     | Configuration files                         |
-| handlers    | Handlers, commands, callbacks               |
-| i18n        | Localization                                |
-| keyboards   | Keyboards reply, inline                     |
-| middlewares | Middlewares for check exists user, antispam |
-| services    | Custom libraries                            |
-| states      | State objects                               |
+| Folder      | Description                              |
+|-------------|------------------------------------------|
+| callbacks   | Callback data                            |
+| configs     | Configuration files                      |
+| handlers    | Handlers, commands, callbacks            |
+| i18n        | Localization                             |
+| keyboards   | Keyboards reply, inline                  |
+| middlewares | Middlewares for localization, throttling |
+| services    | Custom libraries                         |
+| states      | State objects                            |
