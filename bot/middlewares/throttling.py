@@ -13,10 +13,10 @@ CACHE = TTLCache(maxsize=10_000, ttl=2)  # Максимальный размер
 
 class ThrottlingMiddleware(BaseMiddleware):
     async def __call__(
-            self,
-            handler: Callable[[TelegramObject, dict[str, Any]], Awaitable[Any]],
-            event: TelegramObject,
-            data: dict[str, Any],
+        self,
+        handler: Callable[[TelegramObject, dict[str, Any]], Awaitable[Any]],
+        event: TelegramObject,
+        data: dict[str, Any],
     ) -> Any:
         user: User = data.get('event_from_user')
 
