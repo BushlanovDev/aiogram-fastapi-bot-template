@@ -1,6 +1,6 @@
 # 🤖 Aiogram Fastapi Bot Template
 
-[![Actions status](https://github.com/BushlanovDev/aiogram-fastapi-bot-template/actions/workflows/check.yml/badge.svg)](https://github.com/BushlanovDev/aiogram-fastapi-bot-template/actions) [![Python](https://img.shields.io/badge/Python-3.12%2B-brightgreen)](https://www.python.org/downloads/) [![Aiogram](https://img.shields.io/badge/aiogram-3.13-brightgreen)](https://pypi.org/project/aiogram/)
+[![Actions status](https://github.com/BushlanovDev/aiogram-fastapi-bot-template/actions/workflows/check.yml/badge.svg)](https://github.com/BushlanovDev/aiogram-fastapi-bot-template/actions) [![Python](https://img.shields.io/badge/Python-3.12%2B-brightgreen)](https://www.python.org/downloads/) [![Aiogram](https://img.shields.io/badge/aiogram-3.17-brightgreen)](https://pypi.org/project/aiogram/)
 
 A simple template for creating a telegram bot on webhooks using the **aiogram** and **fastapi**
 
