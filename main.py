@@ -17,6 +17,7 @@ from bot.configs.config import App, Settings, TgBot
 from bot.handlers.handlers import Handlers
 from bot.i18n.lexicon import Lexicon
 from bot.keyboards.keyboards import Keyboards
+from bot.middlewares.context import ContextMiddleware
 from bot.middlewares.i18n import I18nMiddleware
 from bot.middlewares.throttling import ThrottlingMiddleware
 from bot.services.bot_service import BotService
@@ -92,10 +93,19 @@ def register_handlers(dp: Dispatcher, hd: Handlers) -> None:
 def register_middlewares(dp: Dispatcher) -> None:
     dp.update.outer_middleware(I18nMiddleware())
     dp.update.outer_middleware(ThrottlingMiddleware())
+    dp.update.outer_middleware(ContextMiddleware())
 
 
 def register_workflow_data(dp: Dispatcher, settings: Settings) -> None:
     dp.workflow_data.update({'answer': 'Hello', 'lexicon': Lexicon(settings.app.default_language)})
+    dp.workflow_data.update(
+        {
+            'answer': 'Hello',
+            'lexicon': Lexicon(settings.app.default_language),
+            'keyboards': Keyboards(),
+            'bot_service': BotService(),
+        }
+    )
 
 
 def create_app(bot: Bot, dp: Dispatcher, settings: App) -> FastAPI:
@@ -115,9 +125,9 @@ def main() -> None:
     bot = create_bot(settings.tg_bot)
     dp = create_dispatcher(MemoryStorage())
     app = create_app(bot, dp, settings.app)
-    register_handlers(dp, Handlers(bot, Keyboards(), BotService()))
-    register_middlewares(dp)
+    register_handlers(dp, Handlers(bot))
     register_workflow_data(dp, settings)
+    register_middlewares(dp)
 
     logger.debug('Application is running')
 

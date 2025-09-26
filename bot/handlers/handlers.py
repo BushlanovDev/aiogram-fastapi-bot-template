@@ -4,26 +4,22 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
 from bot.callbacks.callback import SaveCallbackFactory
-from bot.i18n.lexicon import Lexicon
-from bot.keyboards.keyboards import Keyboards
-from bot.services.bot_service import BotService
+from bot.services.context import HandlerContext
 from bot.states.bot_state import BotState
 
 
 class Handlers:
-    def __init__(self, bot: Bot, kb: Keyboards, bot_service: BotService):
+    def __init__(self, bot: Bot):
         self.bot = bot
-        self.kb = kb
-        self.bot_service = bot_service
 
-    async def start_command(self, message: Message, lexicon: Lexicon, user_lang: str | None):
+    async def start_command(self, message: Message, ctx: HandlerContext, user_lang: str | None):
         await message.answer(
-            text=lexicon.get_text('Hi user! This start message.', user_lang),
-            reply_markup=self.kb.get_start_button(),
+            text=ctx.lexicon.get_text('Hi user! This start message.', user_lang),
+            reply_markup=ctx.keyboards.get_start_button(ctx.lexicon, user_lang),
         )
 
-    async def help_command(self, message: Message, lexicon: Lexicon, user_lang: str | None):
-        await message.answer(text=lexicon.get_text('This help message.', user_lang))
+    async def help_command(self, message: Message, ctx: HandlerContext, user_lang: str | None):
+        await message.answer(text=ctx.lexicon.get_text('This help message.', user_lang))
 
     async def answer(self, message: Message, answer: str):
         await self.__send_message(message.chat.id, answer, message.message_id)
@@ -40,18 +36,18 @@ class Handlers:
     async def answer_fsm_state_2(self, message: Message, state: FSMContext):
         await state.update_data(step_2=message.text)
         data = await state.get_data()
-        await message.answer(f"Step 1: {data['step_1']}\nStep 2: {data['step_2']}")
+        await message.answer(f'Step 1: {data["step_1"]}\nStep 2: {data["step_2"]}')
         await state.clear()
 
-    async def answer_inline_button(self, message: Message, lexicon: Lexicon):
+    async def answer_inline_button(self, message: Message, ctx: HandlerContext, user_lang: str | None):
         callback = SaveCallbackFactory(message_id=message.message_id).pack()
         await message.answer(
-            text=lexicon.get_text('Inline button message'),
-            reply_markup=self.kb.get_inline_button(callback_data=callback),
+            text=ctx.lexicon.get_text('Inline button message'),
+            reply_markup=ctx.keyboards.get_inline_button(ctx.lexicon, user_lang, callback),
         )
 
-    async def reply(self, message: Message):
-        await message.reply(text=self.bot_service.upper(message.text))
+    async def reply(self, message: Message, ctx: HandlerContext):
+        await message.reply(text=ctx.bot_service.upper(message.text))
 
     async def process_any_inline_button_press(self, callback: CallbackQuery, callback_data: SaveCallbackFactory):
         await callback.message.answer(text=callback_data.pack())

@@ -1,6 +1,9 @@
 # 🤖 Aiogram Fastapi Bot Template
 
-[![Actions status](https://github.com/BushlanovDev/aiogram-fastapi-bot-template/actions/workflows/check.yml/badge.svg)](https://github.com/BushlanovDev/aiogram-fastapi-bot-template/actions) [![Python](https://img.shields.io/badge/Python-3.12%2B-brightgreen)](https://www.python.org/downloads/) [![Aiogram](https://img.shields.io/badge/aiogram-3.17-brightgreen)](https://pypi.org/project/aiogram/)
+[![Actions status](https://github.com/BushlanovDev/aiogram-fastapi-bot-template/actions/workflows/check.yml/badge.svg)](https://github.com/BushlanovDev/aiogram-fastapi-bot-template/actions) 
+[![Python](https://img.shields.io/badge/Python-3.12%2B-brightgreen)](https://www.python.org/downloads/) 
+[![Aiogram](https://img.shields.io/badge/aiogram-3.17-brightgreen)](https://pypi.org/project/aiogram/)
+[![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE)
 
 A simple template for creating a telegram bot on webhooks using the **aiogram** and **fastapi**
 
@@ -39,3 +42,7 @@ Run bot `python main.py` or `docker compose up -d`
 | middlewares | Middlewares for localization, throttling |
 | services    | Custom libraries                         |
 | states      | State objects                            |
+
+## 📄 License
+
+This repository's source code is available under the [MIT License](LICENSE).
