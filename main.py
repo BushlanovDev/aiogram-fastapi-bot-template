@@ -1,4 +1,5 @@
 import logging
+import logging.config
 from typing import Callable, Optional
 
 import uvicorn
@@ -36,11 +37,7 @@ def create_startup_handler(bot: Bot, dp: Dispatcher, url: str) -> Callable:
                 drop_pending_updates=True,
             )
 
-        await bot.set_my_commands(
-            [
-                BotCommand(command='/help', description='Help'),
-            ]
-        )
+        await bot.set_my_commands([BotCommand(command='/help', description='Help')])
 
         logger.debug('startup_handler')
 
@@ -78,15 +75,18 @@ def create_dispatcher(storage: Optional[BaseStorage] = None) -> Dispatcher:
     return Dispatcher(storage=storage)
 
 
-def register_handlers(dp: Dispatcher, hd: Handlers) -> None:
+def register_handlers(dp: Dispatcher, hd: Handlers, lexicon: Lexicon) -> None:
     dp.message.register(hd.start_command, CommandStart())
     dp.message.register(hd.help_command, Command(commands='help'))
-    dp.message.register(hd.answer, F.text == 'hi')
-    dp.message.register(hd.answer_inline_button, F.text == 'inline button')
-    dp.message.register(hd.answer_fsm, F.text == 'fsm')
+    dp.message.register(hd.answer, F.text.in_(tuple(sorted(lexicon.get_translations('start_button_hi')))))
+    dp.message.register(
+        hd.answer_inline_button,
+        F.text.in_(tuple(sorted(lexicon.get_translations('start_button_inline')))),
+    )
+    dp.message.register(hd.answer_fsm, F.text.in_(tuple(sorted(lexicon.get_translations('start_button_fsm')))))
     dp.message.register(hd.answer_fsm_state_1, BotState.waiting_step_1)
     dp.message.register(hd.answer_fsm_state_2, BotState.waiting_step_2)
-    dp.message.register(hd.reply)
+    dp.message.register(hd.reply, F.text)
     dp.callback_query.register(hd.process_any_inline_button_press, SaveCallbackFactory.filter())
 
 
@@ -96,16 +96,12 @@ def register_middlewares(dp: Dispatcher) -> None:
     dp.update.outer_middleware(ContextMiddleware())
 
 
-def register_workflow_data(dp: Dispatcher, settings: Settings) -> None:
-    dp.workflow_data.update({'answer': 'Hello', 'lexicon': Lexicon(settings.app.default_language)})
-    dp.workflow_data.update(
-        {
-            'answer': 'Hello',
-            'lexicon': Lexicon(settings.app.default_language),
-            'keyboards': Keyboards(),
-            'bot_service': BotService(),
-        }
-    )
+def register_workflow_data(dp: Dispatcher, lexicon: Lexicon) -> None:
+    dp.workflow_data.update({
+        'lexicon': lexicon,
+        'keyboards': Keyboards(),
+        'bot_service': BotService(),
+    })
 
 
 def create_app(bot: Bot, dp: Dispatcher, settings: App) -> FastAPI:
@@ -124,9 +120,10 @@ def main() -> None:
 
     bot = create_bot(settings.tg_bot)
     dp = create_dispatcher(MemoryStorage())
+    lexicon = Lexicon(settings.app.default_language)
     app = create_app(bot, dp, settings.app)
-    register_handlers(dp, Handlers(bot))
-    register_workflow_data(dp, settings)
+    register_workflow_data(dp, lexicon)
+    register_handlers(dp, Handlers(bot), lexicon)
     register_middlewares(dp)
 
     logger.debug('Application is running')

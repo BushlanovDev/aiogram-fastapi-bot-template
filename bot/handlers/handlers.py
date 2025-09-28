@@ -14,40 +14,47 @@ class Handlers:
 
     async def start_command(self, message: Message, ctx: HandlerContext, user_lang: str | None):
         await message.answer(
-            text=ctx.lexicon.get_text('Hi user! This start message.', user_lang),
+            text=ctx.lexicon.get_text('start_message', user_lang),
             reply_markup=ctx.keyboards.get_start_button(ctx.lexicon, user_lang),
         )
 
     async def help_command(self, message: Message, ctx: HandlerContext, user_lang: str | None):
-        await message.answer(text=ctx.lexicon.get_text('This help message.', user_lang))
+        await message.answer(text=ctx.lexicon.get_text('help_message', user_lang))
 
-    async def answer(self, message: Message, answer: str):
-        await self.__send_message(message.chat.id, answer, message.message_id)
+    async def answer(self, message: Message, ctx: HandlerContext, user_lang: str | None):
+        text = ctx.lexicon.get_text('default_answer', user_lang)
+        await self.__send_message(message.chat.id, text, message.message_id)
 
-    async def answer_fsm(self, message: Message, state: FSMContext):
-        await message.answer('Waiting Step 1')
+    async def answer_fsm(self, message: Message, state: FSMContext, ctx: HandlerContext, user_lang: str | None):
+        await message.answer(ctx.lexicon.get_text('fsm_wait_step_1', user_lang))
         await state.set_state(BotState.waiting_step_1)
 
-    async def answer_fsm_state_1(self, message: Message, state: FSMContext):
+    async def answer_fsm_state_1(self, message: Message, state: FSMContext, ctx: HandlerContext, user_lang: str | None):
         await state.update_data(step_1=message.text)
-        await message.answer('Waiting Step 2')
+        await message.answer(ctx.lexicon.get_text('fsm_wait_step_2', user_lang))
         await state.set_state(BotState.waiting_step_2)
 
-    async def answer_fsm_state_2(self, message: Message, state: FSMContext):
+    async def answer_fsm_state_2(self, message: Message, state: FSMContext, ctx: HandlerContext, user_lang: str | None):
         await state.update_data(step_2=message.text)
         data = await state.get_data()
-        await message.answer(f'Step 1: {data["step_1"]}\nStep 2: {data["step_2"]}')
+        await message.answer(
+            ctx.lexicon.get_text('fsm_result', user_lang).format(
+                step_1=data.get('step_1', ''),
+                step_2=data.get('step_2', ''),
+            )
+        )
         await state.clear()
 
     async def answer_inline_button(self, message: Message, ctx: HandlerContext, user_lang: str | None):
         callback = SaveCallbackFactory(message_id=message.message_id).pack()
         await message.answer(
-            text=ctx.lexicon.get_text('Inline button message'),
+            text=ctx.lexicon.get_text('inline_prompt', user_lang),
             reply_markup=ctx.keyboards.get_inline_button(ctx.lexicon, user_lang, callback),
         )
 
     async def reply(self, message: Message, ctx: HandlerContext):
-        await message.reply(text=ctx.bot_service.upper(message.text))
+        text = message.text or ''
+        await message.reply(text=ctx.bot_service.upper(text))
 
     async def process_any_inline_button_press(self, callback: CallbackQuery, callback_data: SaveCallbackFactory):
         await callback.message.answer(text=callback_data.pack())

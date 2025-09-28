@@ -9,8 +9,14 @@ class Keyboards:
 
     def get_start_button(self, lexicon: Lexicon, user_lang: str | None) -> ReplyKeyboardMarkup:
         kb_list = [
-            [KeyboardButton(text=lexicon.get_text('hi', user_lang)), KeyboardButton(text='test')],
-            [KeyboardButton(text='inline button'), KeyboardButton(text='fsm')],
+            [
+                KeyboardButton(text=lexicon.get_text('start_button_hi', user_lang)),
+                KeyboardButton(text=lexicon.get_text('start_button_test', user_lang)),
+            ],
+            [
+                KeyboardButton(text=lexicon.get_text('start_button_inline', user_lang)),
+                KeyboardButton(text=lexicon.get_text('start_button_fsm', user_lang)),
+            ],
         ]
 
         return ReplyKeyboardMarkup(keyboard=kb_list, resize_keyboard=True, one_time_keyboard=True)
@@ -20,7 +26,10 @@ class Keyboards:
     ) -> InlineKeyboardMarkup:
         inline_kb_list = [
             [
-                InlineKeyboardButton(text=lexicon.get_text('Save', user_lang), callback_data=callback_data),
+                InlineKeyboardButton(
+                    text=lexicon.get_text('inline_save_button', user_lang),
+                    callback_data=callback_data,
+                ),
             ],
         ]
 

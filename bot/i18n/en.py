@@ -1,1 +1,15 @@
-LEXICON_EN: dict[str, str] = {}
+LEXICON_EN: dict[str, str] = {
+    'start_message': 'Hi user! This is the start message.',
+    'help_message': 'This is the help message.',
+    'start_button_hi': 'Hi',
+    'start_button_test': 'Test',
+    'start_button_inline': 'Inline button',
+    'start_button_fsm': 'FSM',
+    'inline_prompt': 'Here is an inline button.',
+    'inline_save_button': 'Save',
+    'fsm_wait_step_1': 'Waiting for step 1',
+    'fsm_wait_step_2': 'Waiting for step 2',
+    'fsm_result': 'Step 1: {step_1}\nStep 2: {step_2}',
+    'default_answer': 'Hello',
+    'throttled_message': 'Too many requests. Please slow down.',
+}
