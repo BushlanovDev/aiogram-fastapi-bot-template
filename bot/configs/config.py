@@ -9,6 +9,7 @@ class App(BaseSettings):
     port: int = 8080
     url: str = 'https://my.domain'
     webhook_path: str = '/webhook/tg'
+    health_path: str = '/healthz'
     default_language: str = 'en'
 
 

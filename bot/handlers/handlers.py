@@ -57,8 +57,12 @@ class Handlers:
         await message.reply(text=ctx.bot_service.upper(text))
 
     async def process_any_inline_button_press(self, callback: CallbackQuery, callback_data: SaveCallbackFactory):
-        await callback.message.answer(text=callback_data.pack())
-        await callback.answer()
+        text = f'Callback packed: {callback_data.pack()}'
+        if callback.message:
+            await callback.message.answer(text=text)
+            await callback.answer()
+        else:
+            await callback.answer(text=text, show_alert=True)
 
     async def __send_message(self, chat_id: int, text: str, reply_to_message_id: int | None = None) -> int:
         await self.bot.send_chat_action(chat_id, ChatAction.TYPING)

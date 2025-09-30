@@ -60,9 +60,8 @@ def create_webhook_handler(bot: Bot, dp: Dispatcher) -> Callable:
             logger.info(f'Received update: {update.update_id}')
             await dp.feed_update(bot, update)
             logger.debug(f'Successfully processed update: {update.update_id}')
-        except Exception as e:
-            logger.error(f'Failed to process update: {str(e)}')
-            raise
+        except Exception:
+            logger.exception('Failed to process update')
 
     return webhook_handler
 
@@ -109,6 +108,7 @@ def create_app(bot: Bot, dp: Dispatcher, settings: App) -> FastAPI:
     app.add_event_handler('startup', create_startup_handler(bot, dp, settings.url + settings.webhook_path))
     app.add_event_handler('shutdown', create_shutdown_handler(bot, settings.debug))
     app.add_api_route(settings.webhook_path, create_webhook_handler(bot, dp), methods=['POST'])
+    app.add_api_route(settings.health_path, lambda: {"status": "ok"}, methods=["GET"])
 
     return app
 
