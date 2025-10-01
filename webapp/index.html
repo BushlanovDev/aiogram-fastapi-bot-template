@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Telegram WebApp Demo</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            color-scheme: light dark;
+        }
+
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            display: flex;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: center;
+            background: var(--tg-theme-bg-color, #0e1621);
+            color: var(--tg-theme-text-color, #ffffff);
+        }
+
+        main {
+            text-align: center;
+            padding: 24px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(6px);
+        }
+
+        button {
+            margin-top: 16px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 999px;
+            font-size: 16px;
+            cursor: pointer;
+            background: var(--tg-theme-button-color, #2cabff);
+            color: var(--tg-theme-button-text-color, #ffffff);
+        }
+    </style>
+</head>
+<body>
+<main>
+    <h1>Telegram WebApp Demo</h1>
+    <p id="status">Initializing...</p>
+    <button type="button" id="action">Send message to bot</button>
+</main>
+<script>
+    const tg = window.Telegram?.WebApp;
+    const status = document.getElementById('status');
+    if (tg) {
+        tg.ready();
+        tg.expand();
+        status.textContent = `Hello, ${tg.initDataUnsafe.user?.first_name ?? 'guest'}!`;
+        document.getElementById('action').addEventListener('click', () => {
+            const payload = {message: 'Hello from WebApp', timestamp: Date.now()};
+            tg.sendData(JSON.stringify(payload));
+            tg.showAlert('Message sent to the bot!');
+        });
+    } else {
+        status.textContent = 'Telegram WebApp context was not detected.';
+        document.getElementById('action').disabled = true;
+    }
+</script>
+</body>
+</html>

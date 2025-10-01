@@ -1,5 +1,6 @@
 import logging
 import logging.config
+from pathlib import Path
 from typing import Callable, Optional
 
 import uvicorn
@@ -12,6 +13,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import BotCommand, Update
 from fastapi import FastAPI
 from fastapi.requests import Request
+from fastapi.staticfiles import StaticFiles
 
 from bot.callbacks.callback import SaveCallbackFactory
 from bot.configs.config import App, Settings, TgBot
@@ -37,7 +39,11 @@ def create_startup_handler(bot: Bot, dp: Dispatcher, url: str) -> Callable:
                 drop_pending_updates=True,
             )
 
-        await bot.set_my_commands([BotCommand(command='/help', description='Help')])
+        await bot.set_my_commands([
+            BotCommand(command='start', description='Start'),
+            BotCommand(command='help', description='Help'),
+            BotCommand(command='webapp', description='Open WebApp'),
+        ])
 
         logger.debug('startup_handler')
 
@@ -77,6 +83,8 @@ def create_dispatcher(storage: Optional[BaseStorage] = None) -> Dispatcher:
 def register_handlers(dp: Dispatcher, hd: Handlers, lexicon: Lexicon) -> None:
     dp.message.register(hd.start_command, CommandStart())
     dp.message.register(hd.help_command, Command(commands='help'))
+    dp.message.register(hd.webapp_command, Command(commands='webapp'))
+
     dp.message.register(hd.answer, F.text.in_(tuple(sorted(lexicon.get_translations('start_button_hi')))))
     dp.message.register(
         hd.answer_inline_button,
@@ -86,6 +94,7 @@ def register_handlers(dp: Dispatcher, hd: Handlers, lexicon: Lexicon) -> None:
     dp.message.register(hd.answer_fsm_state_1, BotState.waiting_step_1)
     dp.message.register(hd.answer_fsm_state_2, BotState.waiting_step_2)
     dp.message.register(hd.reply, F.text)
+
     dp.callback_query.register(hd.process_any_inline_button_press, SaveCallbackFactory.filter())
 
 
@@ -95,11 +104,14 @@ def register_middlewares(dp: Dispatcher) -> None:
     dp.update.outer_middleware(ContextMiddleware())
 
 
-def register_workflow_data(dp: Dispatcher, lexicon: Lexicon) -> None:
+def register_workflow_data(dp: Dispatcher, lexicon: Lexicon, app_settings: App) -> None:
+    base_url = app_settings.url.rstrip('/')
+    web_app_path = '/' + app_settings.web_app_path.lstrip('/')
     dp.workflow_data.update({
         'lexicon': lexicon,
         'keyboards': Keyboards(),
         'bot_service': BotService(),
+        'web_app_url': f'{base_url}{web_app_path}',
     })
 
 
@@ -109,6 +121,8 @@ def create_app(bot: Bot, dp: Dispatcher, settings: App) -> FastAPI:
     app.add_event_handler('shutdown', create_shutdown_handler(bot, settings.debug))
     app.add_api_route(settings.webhook_path, create_webhook_handler(bot, dp), methods=['POST'])
     app.add_api_route(settings.health_path, lambda: {"status": "ok"}, methods=["GET"])
+    web_app_dir = Path(__file__).resolve().parent / 'webapp'
+    app.mount(settings.web_app_path, StaticFiles(directory=web_app_dir, html=True), name='webapp')
 
     return app
 
@@ -122,7 +136,7 @@ def main() -> None:
     dp = create_dispatcher(MemoryStorage())
     lexicon = Lexicon(settings.app.default_language)
     app = create_app(bot, dp, settings.app)
-    register_workflow_data(dp, lexicon)
+    register_workflow_data(dp, lexicon, settings.app)
     register_handlers(dp, Handlers(bot), lexicon)
     register_middlewares(dp)
 

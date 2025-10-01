@@ -5,6 +5,7 @@ LEXICON_EN: dict[str, str] = {
     'start_button_test': 'Test',
     'start_button_inline': 'Inline button',
     'start_button_fsm': 'FSM',
+    'start_button_webapp': 'WebApp',
     'inline_prompt': 'Here is an inline button.',
     'inline_save_button': 'Save',
     'fsm_wait_step_1': 'Waiting for step 1',
@@ -12,4 +13,6 @@ LEXICON_EN: dict[str, str] = {
     'fsm_result': 'Step 1: {step_1}\nStep 2: {step_2}',
     'default_answer': 'Hello',
     'throttled_message': 'Too many requests. Please slow down.',
+    'webapp_message': 'Launch the sample WebApp using the button below.',
+    'webapp_open_button': 'Open WebApp',
 }

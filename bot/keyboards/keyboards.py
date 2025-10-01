@@ -1,4 +1,4 @@
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup, WebAppInfo
 
 from bot.i18n.lexicon import Lexicon
 
@@ -29,6 +29,18 @@ class Keyboards:
                 InlineKeyboardButton(
                     text=lexicon.get_text('inline_save_button', user_lang),
                     callback_data=callback_data,
+                ),
+            ],
+        ]
+
+        return InlineKeyboardMarkup(inline_keyboard=inline_kb_list)
+
+    def get_webapp_button(self, lexicon: Lexicon, user_lang: str | None, web_app_url: str) -> InlineKeyboardMarkup:
+        inline_kb_list = [
+            [
+                InlineKeyboardButton(
+                    text=lexicon.get_text('webapp_open_button', user_lang),
+                    web_app=WebAppInfo(url=web_app_url),
                 ),
             ],
         ]

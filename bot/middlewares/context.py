@@ -9,6 +9,7 @@ class ContextMiddleware(BaseMiddleware):
             lexicon=data['lexicon'],
             keyboards=data['keyboards'],
             bot_service=data['bot_service'],
+            web_app_url=data['web_app_url'],
         )
 
         return await handler(event, data)

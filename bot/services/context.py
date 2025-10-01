@@ -10,3 +10,4 @@ class HandlerContext:
     lexicon: Lexicon
     keyboards: Keyboards
     bot_service: BotService
+    web_app_url: str

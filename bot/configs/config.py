@@ -11,6 +11,7 @@ class App(BaseSettings):
     webhook_path: str = '/webhook/tg'
     health_path: str = '/healthz'
     default_language: str = 'en'
+    web_app_path: str = '/webapp'
 
 
 class TgBot(BaseSettings):

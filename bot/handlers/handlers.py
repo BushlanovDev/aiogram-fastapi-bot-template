@@ -21,6 +21,12 @@ class Handlers:
     async def help_command(self, message: Message, ctx: HandlerContext, user_lang: str | None):
         await message.answer(text=ctx.lexicon.get_text('help_message', user_lang))
 
+    async def webapp_command(self, message: Message, ctx: HandlerContext, user_lang: str | None):
+        await message.answer(
+            text=ctx.lexicon.get_text('webapp_message', user_lang),
+            reply_markup=ctx.keyboards.get_webapp_button(ctx.lexicon, user_lang, ctx.web_app_url),
+        )
+
     async def answer(self, message: Message, ctx: HandlerContext, user_lang: str | None):
         text = ctx.lexicon.get_text('default_answer', user_lang)
         await self.__send_message(message.chat.id, text, message.message_id)
