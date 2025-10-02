@@ -105,13 +105,11 @@ def register_middlewares(dp: Dispatcher) -> None:
 
 
 def register_workflow_data(dp: Dispatcher, lexicon: Lexicon, app_settings: App) -> None:
-    base_url = app_settings.url.rstrip('/')
-    web_app_path = '/' + app_settings.web_app_path.lstrip('/')
     dp.workflow_data.update({
         'lexicon': lexicon,
         'keyboards': Keyboards(),
         'bot_service': BotService(),
-        'web_app_url': f'{base_url}{web_app_path}',
+        'web_app_url': app_settings.web_app_url,
     })
 
 
@@ -120,9 +118,9 @@ def create_app(bot: Bot, dp: Dispatcher, settings: App) -> FastAPI:
     app.add_event_handler('startup', create_startup_handler(bot, dp, settings.url + settings.webhook_path))
     app.add_event_handler('shutdown', create_shutdown_handler(bot, settings.debug))
     app.add_api_route(settings.webhook_path, create_webhook_handler(bot, dp), methods=['POST'])
-    app.add_api_route(settings.health_path, lambda: {"status": "ok"}, methods=["GET"])
+    app.add_api_route(settings.health_path, lambda: {'status': 'ok'}, methods=['GET'])
     web_app_dir = Path(__file__).resolve().parent / 'webapp'
-    app.mount(settings.web_app_path, StaticFiles(directory=web_app_dir, html=True), name='webapp')
+    app.mount('/webapp', StaticFiles(directory=web_app_dir, html=True), name='webapp')
 
     return app
 

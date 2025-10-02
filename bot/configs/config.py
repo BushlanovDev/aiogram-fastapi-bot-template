@@ -10,8 +10,8 @@ class App(BaseSettings):
     url: str = 'https://my.domain'
     webhook_path: str = '/webhook/tg'
     health_path: str = '/healthz'
+    web_app_url: str = 'https://my.domain/webapp'
     default_language: str = 'en'
-    web_app_path: str = '/webapp'
 
 
 class TgBot(BaseSettings):
